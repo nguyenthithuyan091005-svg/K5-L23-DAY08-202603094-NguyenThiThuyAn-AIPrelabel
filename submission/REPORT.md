@@ -6,40 +6,53 @@
 
 | Lớp | Model + cỡ | Ngưỡng | Vì sao (dẫn `run_id` trong `model_log.csv`) |
 |---|---|---|---|
-| person / bicycle / motorbike / car / bus / truck | <<YOLO26m>> | <<theo lớp, từ threshold_sweep>> | <<>> |
-| three_wheeler | <<YOLOE-26s, prompt: ...>> | <<>> | <<>> |
+| person / bicycle / motorbike / car / bus / truck | YOLO26m (`yolo26m.pt`) | person 0.15, motorbike 0.25; bicycle, car, bus, truck dùng 0.3 (mặc định) | Tôi chạy YOLO26 một lần ở conf 0.05 cho cả 36 ảnh (r05), rồi lọc theo từng lớp. Ngưỡng cao 0.5 làm mất người và xe máy nhỏ ở xa (r02: img_019 motorbike từ 7 còn 2). Bicycle chỉ có 4 vật trong gold, bus và truck không có vật nào, còn car không ngưỡng nào đạt recall 90% (cao nhất 83%, 6 vật), nên 4 lớp này để mặc định. |
+| three_wheeler | YOLOE-26s (`yoloe-26s-seg.pt`), prompt: tuk-tuk, cyclo, cargo tricycle | 0.15 | YOLO26 không có lớp xe 3 bánh nên hay gọi là car/truck (r01). YOLOE tìm bằng chữ thì thấy được (r03: img_002 điểm 0.93, img_032 cả 3 box đều đúng; r06: 125 box trên 36 ảnh). Trên gold: recall 100%, precision 56% (5 vật). |
 
 - Lệnh `merge_prelabels.py` đã dùng (dán nguyên): <<>>
+  - Trả lời: `python scripts/merge_prelabels.py work/prelabel/yoloe_all/pre.coco.json work/prelabel/y26_all/pre.coco.json --thr "person=0.15,motorbike=0.25,three_wheeler=0.15" --conf 0.3 --iou 0.6 --split "batch,gold" --out work/prelabel/merged_review/pre.coco.json`
 - **Phiên bản SAM bạn chọn** (SAM 1 / 2.1 / 3) và lý do: <<chất lượng mask, tốc độ, RAM, quyền truy cập>>
+  - Trả lời: Tôi chọn SAM 2.1 (`sam2.1_b.pt`). Tôi mới chạy bản này (r04): mask bám khá sát viền xe máy ở img_013 và chạy được trên Mac (MPS), khoảng 8 giây một ảnh. Tôi chưa thử SAM 1 để so sánh. Tôi không dùng SAM 3 vì phải xin quyền truy cập, mà máy tôi chưa đăng nhập HuggingFace. Về RAM thì tôi chưa ghi lại con số.
 - Lỗi nào **không sửa được bằng đổi ngưỡng** (ví dụ tuk-tuk bị gọi `car`)? Sửa thế nào? <<>>
+  - Trả lời: Xe 3 bánh bị máy gọi là car hoặc truck (r01: img_011 bị gọi truck 0.77; r04: img_004 hai box car 0.37 và 0.34, img_013 box car 0.42, đều là tuk-tuk). Máy gọi sai tên chứ không phải thiếu tự tin, nên đổi ngưỡng không giúp được. Tôi sửa bằng cách chạy thêm YOLOE (gõ chữ three_wheeler) rồi gộp vào, và khi review thì tự đổi lại tên lớp cho đúng.
 - Box **điểm cao mà sai** hoặc **điểm thấp mà đúng** (ảnh nào): <<>>
+  - Trả lời: Điểm cao mà sai: img_011 truck 0.77 (thật ra là xe 3 bánh, r01). Điểm vừa mà sai lớp: img_018 three_wheeler 0.53 (thật ra là xe minibus, tôi đổi thành bus) và img_024 truck 0.53 (xe van chở khách, tôi đổi thành bus). Điểm thấp mà đúng: img_032, YOLOE cho 3 box 0.92 / 0.48 / 0.27 và cả 3 đều đúng three_wheeler (r03). Nếu đặt ngưỡng cao thì sẽ mất các box này.
 - Giới hạn: chọn ngưỡng trên chính gold (4 ảnh) nên số đo máy trên gold là lạc quan: <<>>
+  - Trả lời: Tôi chọn ngưỡng và chấm điểm trên cùng 4 ảnh gold, nên máy trông tốt hơn thực tế. Lớp ít vật (bicycle 4, bus 0, truck 0, three_wheeler 5) thì ngưỡng chỉ là ước lượng sơ sơ.
 
 ## 2. AI error profile (từ `qc/review_stats.md`)
 
 | Trạng thái | Số | Tỉ lệ | Mẫu số |
 |---|---|---|---|
-| accepted | <<>> | <<>> | <<box máy>> |
-| edited | <<>> | <<>> | <<>> |
-| deleted | <<>> | <<>> | <<>> |
-| added | <<>> | <<>> | <<đối tượng sau duyệt>> |
+| accepted | 410 | 64.0% | 641 box máy |
+| edited | 103 | 16.1% | 641 box máy |
+| deleted | 116 | 18.1% | 641 box máy |
+| added | 47 | 8.4% | 560 đối tượng sau duyệt |
 
 - Lớp nào máy tệ nhất? Vì sao (dẫn ảnh)? <<>>
+  - Trả lời: Tệ nhất là three_wheeler (xe 3 bánh): chỉ 4/42 box giữ nguyên (khoảng 10%), 12 box phải sửa, 26 box bị xoá, 5 box phải vẽ thêm. Máy hay gọi xe 3 bánh là truck hoặc bus (img_003: 2 box thành truck, 4 box xoá; img_013: 2 box thành bus; img_014: 3 box xoá). Các lớp khác khá hơn: person 262/369 (≈ 71%), car 40/52 (≈ 77%), motorbike 94/150 (≈ 63%, có 39 box phải sửa, nhiều ở ảnh đông xe máy). Ghi chú: tôi bỏ 23 đối tượng quanh các bẫy ra khỏi bảng vì đó là lỗi cố ý cài vào. Trong 47 box vẽ thêm có 10 cái chỉ là sửa tên lớp, nên máy sót thật khoảng 37 vật.
 - So với gold: precision / recall của **máy** <<>> (mẫu số: <<đối tượng gold>>)
+  - Trả lời: Precision 57.1% (khoảng tin cậy 45–69%), recall 90.0% (77–96%); mẫu số là 40 đối tượng gold (máy tìm đúng 36, thừa 27, sót 4). Nghĩa là máy ít bỏ sót nhưng đưa ra nhiều box thừa, vì ngưỡng tôi chọn thấp (person 0.15, three_wheeler 0.15). Số này đẹp hơn thực tế vì tôi chọn ngưỡng và chấm điểm trên cùng 4 ảnh.
 
 ## 3. Thiên kiến tự động hóa và ảnh bẫy
 
 - Bắt bẫy: <<.../12>>; loại nào lọt: <<>>; vì sao (bạn đã bỏ bước nào của checklist)? <<>>
+  - Bắt được: 7/12 = 58.3% (khoảng tin cậy 32–81%, thấp hơn mức 80%). Chỉ có 12 bẫy nên con số này không chắc chắn lắm.
+  - Loại lọt: box lệch (loose) lọt 2/3: img_005 box person bị dời xuống 37–91 px, img_006 box motorbike nhỏ 51×61 px lệch khoảng 9–16 px. Sai lớp (wrong_class) lọt 2/3: img_008 một person rất nhỏ 16×29 px bị gán bicycle, tôi giữ nguyên; img_034 three_wheeler bị gán motorbike, tôi thấy sai và đổi thành truck, nhưng đáp án là three_wheeler nên bị tính lọt. Thiếu box (missing) lọt 1/3: img_029 thiếu một person sát mép trái. Box thừa (extra) bắt đủ 3/3.
+  - Vì sao: Tôi không ghi lại từng bước khi duyệt nên không dám nói mình đã bỏ bước nào. Chỉ biết các ca lọt rơi vào bước 4 (box lỏng, 2 ca), bước 3 (sai nhãn, 2 ca) và bước 1 (bỏ sót, 1 ca); 2 trong 5 ca nằm ở ảnh đông xe máy (img_005, img_029). Tôi duyệt ngắt quãng, không làm một mạch. Lúc duyệt tôi khá mệt, nhiều ca khó, và ảnh có rất nhiều vật nên phải nhìn kỹ từng cái, nên có thể tôi đã bỏ sót mấy lỗi nhỏ.
 - Accepted cao mà bắt bẫy thấp (hoặc ngược lại) nói gì về cách bạn duyệt? <<>>
+  - Trả lời: Accepted 64.0% mà bắt bẫy chỉ 58.3%, nghĩa là giữ nguyên nhiều box chưa chắc là tôi đã kiểm kỹ. Box vô lý thì tôi bắt dễ, nhưng hay để lọt lỗi nhìn qua thấy bình thường (box lệch ít, vật rất nhỏ, người đứng sát mép). Điểm tin cậy của máy cũng không báo trước được mấy lỗi này. Chỉ có 12 bẫy nên kết luận này chưa chắc chắn.
 
 ## 4. Máy có đáng dùng không?
 
 - Thời gian (từ `time_log.csv`): gán tay <<... phút/ảnh>> vs duyệt <<... phút/ảnh>>. Thiên lệch (bạn gán gold trước nên đã quen cảnh): <<>>
+  - Trả lời: Gán tay 5 phút/ảnh (20 phút cho 4 ảnh), duyệt 5 phút/ảnh (120 phút cho 24 ảnh). Hai số này tôi tự báo gần đúng chứ không bấm giờ chính xác. Tôi đã quen kiểu ảnh sau khi gán gold, nhưng ảnh batch lại đông hơn (có 6 ảnh nhiều xe máy), nên hai số khó so sánh công bằng.
 - Kết luận: <<có / không / chỉ cho lớp nào>>, dựa trên <<số liệu>>
+  - Trả lời: Chỉ đáng dùng cho một vài lớp. Máy giữ nguyên được 64.0% box, nhưng tôi không nhanh hơn (5 phút/ảnh cả hai cách), bắt bẫy mới 58.3% (dưới 80%), và three_wheeler chỉ khoảng 10% box dùng được. Tôi sẽ dùng máy cho person và car (thêm motorbike nếu chịu sửa box). Với three_wheeler thì tự vẽ, hoặc chạy YOLOE rồi duyệt thật kỹ.
 - **Ba quy tắc giảm thiên kiến của bạn** (mỗi quy tắc kiểm tra được bằng số hoặc việc làm):
-  1. <<>>
-  2. <<>>
-  3. <<>>
+  1. Ẩn nhãn máy, tự đếm vật trước rồi mới hiện nhãn máy lên. Kiểm tra bằng số bẫy thiếu box bắt được (hiện 2/3).
+  2. Gặp vật nhỏ hoặc xe 3 bánh thì phóng to xem lại tên lớp, không chỉ nhìn cái khung. Kiểm tra bằng số bẫy sai lớp bắt được (hiện 1/3).
+  3. Nghỉ sau mỗi khoảng 10 ảnh. Mục tiêu bắt bẫy ít nhất 10/12 mới coi là xong lô.
 
 ## 5. Mask SAM cho 3 vật (Part 5)
 
@@ -70,8 +83,14 @@ Nếu Rework / Hold, việc cần làm tiếp: <<>>
 ## 8. Ghi chú cá nhân
 
 - **Dùng AI để làm bài** (công cụ nào, việc gì, kiểm tra thế nào; "không dùng" nếu không): <<>>
+  - Trả lời: Tôi dùng Claude Code (trợ lý AI). Dùng để: kiểm tra môi trường và tải model, chạy các lệnh Part 2, hỏi cách hiểu guideline ở các ca khó lúc review (xe điện, hàng nhô ra, xe van, vùng ignore), nhận dạng xe qua ảnh chụp màn hình CVAT, tổng hợp số đo từ `review_stats.md`, và soạn nháp câu chữ báo cáo từ số liệu và nhật ký của tôi. Cách kiểm tra: nhận xét trong `model_log.csv` tôi tự nhìn ảnh rồi sửa theo những gì tôi thấy; số liệu trong báo cáo được đối chiếu với `review_stats.md`; quyết định gán nhãn từng ca là tôi chọn. Lưu ý: ảnh chụp màn hình tôi gửi cho AI là ảnh trong Task review (batch), và RULES.md ghi không gửi ảnh lên dịch vụ AI đám mây nếu giảng viên chưa cho phép, nên tôi ghi rõ ở đây.
 - Gold có bị nhiễm không (bạn có nhìn pre-label hay hỏi AI trước khi gán xong)? <<không / có, như sau: ...>>
+  - Trả lời: <<TODO: bạn tự trả lời thật: có nhìn pre-label hay hỏi AI trước khi gán xong 4 ảnh gold không?>>
 - Máy / GPU / CVAT dùng; vướng mắc cài đặt: <<>>
+  - Trả lời: MacBook chip Apple M2, macOS 26.4, chạy model trên GPU Apple (MPS), Python 3.12. CVAT chạy bằng Docker (`cvat/server:dev`). Lúc đầu CVAT bị lag vì Docker chỉ được cấp 4 CPU và khoảng 3,8 GB RAM, mấy container phân tích (clickhouse, vector, grafana) dùng nhiều CPU; sau đó tôi thấy CVAT trả lời nhanh hơn.
 - Dùng cache `data/cache/` thay vì tự chạy? <<không / có, vì ...>>
+  - Trả lời: Không. Tôi tự chạy YOLO26m và YOLOE trên cả 36 ảnh (r05, r06 trong `work/runs.csv`).
 - Lỗi / bug script đã gặp (nếu có): <<>>
+  - Trả lời: Chưa có lỗi script nào mà tôi ghi lại được.
 - Một điều bạn làm khác lần sau: <<>>
+  - Trả lời: Tôi sẽ bấm đồng hồ thật để ghi `time_log` (lần này tôi chỉ ước chừng 20 phút và 2 giờ), và ghi lại từng ảnh đã duyệt theo checklist để biết mình bỏ bước nào.
