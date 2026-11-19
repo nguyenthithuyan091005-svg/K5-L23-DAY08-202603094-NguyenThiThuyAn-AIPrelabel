@@ -1,4 +1,4 @@
-# Báo cáo Day 08 — <<MSHV - Họ và tên>>
+# Báo cáo Day 08 — 202603094 - Nguyễn Thị Thúy An
 
 > Một file duy nhất cho cả bài (đã gộp recipe, QC và ghi chú cá nhân). Mọi con số kèm **mẫu số** và nguồn (file nào). Viết bằng lời của bạn.
 
@@ -58,9 +58,12 @@
 
 | Ảnh | SAM (phiên bản) | Số click | Mask gồm người lái / hàng hoá? | Lỗi quan sát | File trong `masks/` |
 |---|---|---|---|---|---|
-| <<img_0xx>> | <<>> | <<>> | <<>> | <<>> | <<>> |
+| img_013 (tuk-tuk có người lái) | SAM 2.1 (`sam2.1_b.pt`) | 13 (6 dương, 7 âm) | Không| Mask không phủ hết xe| `masks/tuktuk_img013.jpg` |
+| img_008 (xe ba gác chở chuối) | SAM 2.1 (`sam2.1_b.pt`) | 3 (2 dương, 1 âm) | Có gồm chuối (hàng hoá)| Mask không phủ hết xe, có lỗ ở bánh xe | `masks/bagac_chuoi_img008.jpg` |
+| img_031 (xe đạp chở hàng) | SAM 2.1 (`sam2.1_b.pt`) | 4 (3 dương, 1 âm) | Có gồm cả giỏ hàng| Bánh xe không mask hết, có chỗ có mask chỗ không | `masks/xedap_hang_img031.jpg` |
 
-- Đối chiếu guideline mục 4.2: quy tắc nào giúp, quy tắc nào thiếu? <<>>
+- Đối chiếu guideline mục 4.2: quy tắc nào giúp, quy tắc nào thiếu? 
+  - Trả lời: Mục 4.2.4 (mỗi vật một polygon, không chồng nhau, vùng chạm thuộc vật phía trước) giúp tôi quyết định mask xe không nên chứa người, vì người là vật riêng. Guideline còn thiếu một quy tắc nói rõ mask có gồm hàng hoá không: mask của img_008 gồm chuối và mask của img_031 gồm cả giỏ, tôi không biết là đúng hay sai (đây là câu hỏi mở số 3, phần "mask thì sao?"). Mục 4.2.2 (lỗ nhỏ hơn khoảng 5% diện tích thì không vẽ lỗ) giúp tôi coi lỗ ở nan hoa bánh xe là chấp nhận được.
 - *(Tuỳ chọn)* Interactor SAM trong CVAT: làm được / không (lỗi gì, đã thử gì); khác gì offline: <<>>
 
 ## 6. Calibration (Part 6)
@@ -85,7 +88,7 @@ Nếu Rework / Hold, việc cần làm tiếp: <<>>
 - **Dùng AI để làm bài** (công cụ nào, việc gì, kiểm tra thế nào; "không dùng" nếu không): <<>>
   - Trả lời: Tôi dùng Claude Code (trợ lý AI). Dùng để: kiểm tra môi trường và tải model, chạy các lệnh Part 2, hỏi cách hiểu guideline ở các ca khó lúc review (xe điện, hàng nhô ra, xe van, vùng ignore), nhận dạng xe qua ảnh chụp màn hình CVAT, tổng hợp số đo từ `review_stats.md`, và soạn nháp câu chữ báo cáo từ số liệu và nhật ký của tôi. Cách kiểm tra: nhận xét trong `model_log.csv` tôi tự nhìn ảnh rồi sửa theo những gì tôi thấy; số liệu trong báo cáo được đối chiếu với `review_stats.md`; quyết định gán nhãn từng ca là tôi chọn. Lưu ý: ảnh chụp màn hình tôi gửi cho AI là ảnh trong Task review (batch), và RULES.md ghi không gửi ảnh lên dịch vụ AI đám mây nếu giảng viên chưa cho phép, nên tôi ghi rõ ở đây.
 - Gold có bị nhiễm không (bạn có nhìn pre-label hay hỏi AI trước khi gán xong)? <<không / có, như sau: ...>>
-  - Trả lời: <<TODO: bạn tự trả lời thật: có nhìn pre-label hay hỏi AI trước khi gán xong 4 ảnh gold không?>>
+  - Trả lời: Không, tôi tự làm 100%
 - Máy / GPU / CVAT dùng; vướng mắc cài đặt: <<>>
   - Trả lời: MacBook chip Apple M2, macOS 26.4, chạy model trên GPU Apple (MPS), Python 3.12. CVAT chạy bằng Docker (`cvat/server:dev`). Lúc đầu CVAT bị lag vì Docker chỉ được cấp 4 CPU và khoảng 3,8 GB RAM, mấy container phân tích (clickhouse, vector, grafana) dùng nhiều CPU; sau đó tôi thấy CVAT trả lời nhanh hơn.
 - Dùng cache `data/cache/` thay vì tự chạy? <<không / có, vì ...>>
