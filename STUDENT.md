@@ -5,7 +5,7 @@
 - Lớp (L2 / L3 / khác): L2
 - Tài khoản GitHub: nguyenthithuyan091005-svg
 - Repo bài nộp (URL): https://github.com/nguyenthithuyan091005-svg/K5-L23-DAY08-202603094-NguyenThiThuyAn-AIPrelabel
-- Commit chốt bài (hash): <<>>
+- Commit chốt bài (hash): 8f19a15
 - Máy: Mac chip Apple M2 (8 nhân CPU), RAM 8 GB, macOS 26.4, GPU Apple (MPS)
 - CVAT (Docker): v2.82.1
 
