@@ -1,0 +1,9 @@
+image,object_id,error_type,reviewer,note
+img_003.jpg,22,sai_lop,Nguyễn Thị Thúy An,"#22 three_wheeler ở mép phải ảnh nằm sát và chồng lên xe máy #8, không phải xe ba bánh. Có thể là xe ba bánh nhưng không chắc chắn, tính là lỗi nghi ngờ"
+img_006.jpg,,khong,Nguyễn Thị Thúy An,"Không có lỗi. Vị trí motorbike từng là bẫy loose nay là ignore_region #93, chấp nhận được theo guideline cụm xe dày"
+img_008.jpg,111,sai_lop,Nguyễn Thị Thúy An,"#111 bicycle 0.70 ở góc trái trên, vật đó là người nên phải là person. Đây là bẫy wrong_class img_008 đã lọt khi duyệt"
+img_013.jpg,,khong,Nguyễn Thị Thúy An,Không có lỗi. Box three_wheeler #133 ôm đúng xe
+img_014.jpg,,khong,Nguyễn Thị Thúy An,Không có lỗi
+img_018.jpg,,khong,Nguyễn Thị Thúy An,"Không có lỗi. Ảnh dày, chỉ kiểm bằng mắt trên overlay"
+img_021.jpg,,khong,Nguyễn Thị Thúy An,"Không có lỗi. Ảnh dày, chỉ kiểm bằng mắt trên overlay"
+img_035.jpg,,khong,Nguyễn Thị Thúy An,Không có lỗi. Bẫy wrong_class img_035 đã sửa từ lúc duyệt
