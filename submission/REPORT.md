@@ -100,7 +100,7 @@ Nếu Rework / Hold, việc cần làm tiếp:
 ## 8. Ghi chú cá nhân
 
 - **Dùng AI để làm bài** (công cụ nào, việc gì, kiểm tra thế nào; "không dùng" nếu không):
-  - Trả lời: Tôi dùng Claude Code (trợ lý AI). Dùng để: kiểm tra môi trường và tải model, chạy các lệnh Part 2, hỏi cách hiểu guideline ở các ca khó lúc review (xe điện, hàng nhô ra, xe van, vùng ignore), nhận dạng xe qua ảnh chụp màn hình CVAT, tổng hợp số đo từ `review_stats.md`, và soạn nháp câu chữ báo cáo từ số liệu, nhật ký và quyết định của tôi trong quá trình làm bài. Cách kiểm tra: nhận xét trong `model_log.csv` tôi tự nhìn ảnh rồi sửa theo những gì tôi thấy, số liệu trong báo cáo được đối chiếu với `review_stats.md`, quyết định gán nhãn từng ca là tôi chọn. 
+  - Trả lời: Tôi dùng Claude Code (trợ lý AI). Dùng để: kiểm tra môi trường và tải model, chạy các lệnh Part 2, hỏi cách hiểu guideline ở các ca khó lúc review (xe điện, hàng nhô ra, xe van, vùng ignore), tổng hợp số đo từ `review_stats.md`, và soạn nháp câu chữ báo cáo từ số liệu, nhật ký và quyết định của tôi trong quá trình làm bài. Cách kiểm tra: nhận xét trong `model_log.csv` tôi tự nhìn ảnh rồi sửa theo những gì tôi thấy, số liệu trong báo cáo được đối chiếu với `review_stats.md`, quyết định gán nhãn từng ca là tôi chọn. 
 - Gold có bị nhiễm không (bạn có nhìn pre-label hay hỏi AI trước khi gán xong)?
   - Trả lời: Không, tôi tự làm 100%
 - Máy / GPU / CVAT dùng; vướng mắc cài đặt:
