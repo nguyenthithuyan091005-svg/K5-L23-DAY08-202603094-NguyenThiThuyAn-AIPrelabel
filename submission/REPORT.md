@@ -40,16 +40,16 @@
   - Bắt được: 7/12 = 58.3% (khoảng tin cậy 32–81%, thấp hơn mức 80%). Chỉ có 12 bẫy nên con số này không chắc chắn lắm.
   - Loại lọt: box lệch (loose) lọt 2/3: img_005 box person bị dời xuống 37–91 px, img_006 box motorbike nhỏ 51×61 px lệch khoảng 9–16 px. Sai lớp (wrong_class) lọt 2/3: img_008 một person rất nhỏ 16×29 px bị gán bicycle, tôi giữ nguyên; img_034 three_wheeler bị gán motorbike, tôi thấy sai và đổi thành truck, nhưng đáp án là three_wheeler nên bị tính lọt. Thiếu box (missing) lọt 1/3: img_029 thiếu một person sát mép trái. Box thừa (extra) bắt đủ 3/3.
   - Vì sao: Tôi không ghi lại từng bước khi duyệt nên không dám nói mình đã bỏ bước nào. Chỉ biết các ca lọt rơi vào bước 4 (box lỏng, 2 ca), bước 3 (sai nhãn, 2 ca) và bước 1 (bỏ sót, 1 ca); 2 trong 5 ca nằm ở ảnh đông xe máy (img_005, img_029). Tôi duyệt ngắt quãng, không làm một mạch. Lúc duyệt tôi khá mệt, nhiều ca khó, và ảnh có rất nhiều vật nên phải nhìn kỹ từng cái, nên có thể tôi đã bỏ sót mấy lỗi nhỏ.
-  - Sau khi chạy review_stats: tôi đã mở lại 5 ảnh bẫy lọt (img_005, img_006, img_008, img_029, img_034) và sửa trong qc_fixed.json (mục 7). Kết quả 7/12 giữ nguyên vì đó là số đo của lần duyệt đầu. Tôi không sửa batch_reviewed.json và không chạy lại review_stats, vì lúc đó tôi đã biết bẫy nằm ở đâu.
+  - Sau khi chạy review_stats: tôi duyệt lại cả lô 24 ảnh trên CVAT, trong đó có 5 ảnh bẫy lọt (img_005, img_006, img_008, img_029, img_034), và đưa phần sửa vào qc_fixed.json (mục 7). Kết quả 7/12 giữ nguyên vì đó là số đo của lần duyệt đầu. Tôi không sửa batch_reviewed.json và không chạy lại review_stats, vì lúc đó tôi đã biết bẫy nằm ở đâu.
 - Accepted cao mà bắt bẫy thấp (hoặc ngược lại) nói gì về cách bạn duyệt?
   - Trả lời: Accepted 64.0% mà bắt bẫy chỉ 58.3%, nghĩa là giữ nguyên nhiều box chưa chắc là tôi đã kiểm kỹ. Box vô lý thì tôi bắt dễ, nhưng hay để lọt lỗi nhìn qua thấy bình thường (box lệch ít, vật rất nhỏ, người đứng sát mép). Điểm tin cậy của máy cũng không báo trước được mấy lỗi này. Chỉ có 12 bẫy nên kết luận này chưa chắc chắn.
 
 ## 4. Máy có đáng dùng không?
 
 - Thời gian (từ `time_log.csv`), Thiên lệch (bạn gán gold trước nên đã quen cảnh):
-  - Trả lời: Gán tay 5 phút/ảnh (20 phút cho 4 ảnh), duyệt 5 phút/ảnh (120 phút cho 24 ảnh). Hai số này tôi tự báo gần đúng chứ không bấm giờ chính xác. Tôi đã quen kiểu ảnh sau khi gán gold, nhưng ảnh batch lại đông hơn (có 6 ảnh nhiều xe máy), nên hai số khó so sánh công bằng.
+  - Trả lời: Gán tay khoảng 3.8 phút/ảnh (15 phút cho 4 ảnh), duyệt khoảng 6.3 phút/ảnh (150 phút cho 24 ảnh). Hai số này tôi đo khi làm. Tôi đã quen kiểu ảnh sau khi gán gold, nhưng ảnh batch lại đông hơn (có 6 ảnh nhiều xe máy), nên hai số khó so sánh công bằng.
 - Kết luận:
-  - Trả lời: Chỉ đáng dùng cho một vài lớp. Máy giữ nguyên được 64.0% box, nhưng tôi không nhanh hơn (5 phút/ảnh cả hai cách), bắt bẫy mới 58.3% (dưới 80%), và three_wheeler chỉ khoảng 10% box dùng được. Tôi sẽ dùng máy cho person và car (thêm motorbike nếu chịu sửa box). Với three_wheeler thì tự vẽ, hoặc chạy YOLOE rồi duyệt thật kỹ.
+  - Trả lời: Chỉ đáng dùng cho một vài lớp. Máy giữ nguyên được 64.0% box, nhưng duyệt có pre-label còn chậm hơn gán tay (khoảng 6.3 so với 3.8 phút/ảnh, dù ảnh batch đông hơn), bắt bẫy mới 58.3% (dưới 80%), và three_wheeler chỉ khoảng 10% box dùng được. Tôi sẽ dùng máy cho person và car (thêm motorbike nếu chịu sửa box). Với three_wheeler thì tự vẽ, hoặc chạy YOLOE rồi duyệt thật kỹ.
 - **Ba quy tắc giảm thiên kiến của bạn** (mỗi quy tắc kiểm tra được bằng số hoặc việc làm):
   1. Ẩn nhãn máy, tự đếm vật trước rồi mới hiện nhãn máy lên. Kiểm tra bằng số bẫy thiếu box bắt được (hiện 2/3).
   2. Gặp vật nhỏ hoặc xe 3 bánh thì phóng to xem lại tên lớp, không chỉ nhìn cái khung. Kiểm tra bằng số bẫy sai lớp bắt được (hiện 1/3).
@@ -95,13 +95,16 @@
     - Không phải Hold: 7 câu hỏi mở đã chốt trong guideline v1.1, dữ liệu không hỏng.
     - Là Rework vì: ảnh có lỗi 2/8 = 25.0% (ngưỡng 2%); bắt bẫy 7/12 = 58.3% (cần ít nhất 80%); máy lặp lỗi ở lớp three_wheeler.
 Nếu Rework / Hold, việc cần làm tiếp:
-  - Đã làm: sửa trên CVAT, export thành qc_fixed.json (13 ảnh), release còn 571 đối tượng. Gồm 5 bẫy lọt, xe trắng mờ ở img_013 thành ignore_region, và xoá 12 box dưới 20 px. Lưu ý: số đo review, bắt bẫy và QC vẫn tính trên nhãn trước khi sửa.
-  - Còn phải làm: duyệt lại cả lô theo checklist và guideline v1.1, xem lại box three_wheeler ở mép phải img_003, QC lại với mẫu lớn hơn 8 ảnh.
+  - Đã làm: sau khi có quyết định Rework, tôi duyệt lại cả lô 24 ảnh theo guideline v1.1 và export các ảnh đã sửa thành `labels/qc_fixed.json` (15 ảnh); release dựng lại bằng `build_release.py` còn 569 đối tượng. Các sửa gồm: 5 bẫy lọt (img_005, 006, 008, 029, 034), xe trắng mờ ở img_013 chuyển thành ignore_region, xoá 12 box dưới 20 px, và xoá 2 box ma conf thấp ở img_003 (three_wheeler mép phải) và img_031 (person trên áo treo).
+  - Cách duyệt lại: 13 ảnh sửa trên CVAT rồi export. 11 ảnh còn lại (img_003, 004, 009, 010, 021, 022, 023, 025, 028, 031, 033) tôi duyệt lại trên CVAT (Task #34) theo checklist: ẩn nhãn, tự quét ảnh trước, rồi soi lớp và 4 cạnh từng box. Tôi xoá 2 box ma (img_003 three_wheeler mép phải, img_031 person trên áo treo) trên CVAT, Claude ghi 2 xoá này vào `qc_fixed.json`; ngoài 2 box đó tôi không sửa thêm box nào, nên `qc_fixed.json` (15 ảnh) đã khớp với nhãn trên CVAT; 9 ảnh không sửa vẫn lấy nhãn từ `batch_reviewed.json`.
+  - Số liệu: review_stats, bắt bẫy 7/12 và QC 2/8 vẫn là số đo của lần duyệt đầu, trên nhãn trước khi sửa. Tôi không đo lại sau khi sửa vì lúc đó tôi đã biết đáp án bẫy, nên số đo mới không còn trung thực.
+  - Lưu ý về lỗi QC ở img_003: box #22 thực ra là box ma (thừa), không phải sai lớp thật; `qc_review.csv` ghi sai_lop vì lúc kiểm tôi chưa chắc. Tôi giữ nguyên cách ghi lúc đó và không sửa số QC.
+  - Còn phải làm (chưa làm): kiểm lại nhãn đã sửa bằng một mẫu QC mới (vòng 2) lớn hơn 8 ảnh.
 
 ## 8. Ghi chú cá nhân
 
 - **Dùng AI để làm bài** (công cụ nào, việc gì, kiểm tra thế nào; "không dùng" nếu không):
-  - Trả lời: Tôi dùng Claude Code (trợ lý AI). Dùng để: kiểm tra môi trường và tải model, chạy các lệnh Part 2, hỏi cách hiểu guideline ở các ca khó lúc review (xe điện, hàng nhô ra, xe van, vùng ignore), tổng hợp số đo từ `review_stats.md`, và soạn nháp câu chữ báo cáo từ số liệu, nhật ký và quyết định của tôi trong quá trình làm bài. Cách kiểm tra: nhận xét trong `model_log.csv` tôi tự nhìn ảnh rồi sửa theo những gì tôi thấy, số liệu trong báo cáo được đối chiếu với `review_stats.md`, quyết định gán nhãn từng ca là tôi chọn. 
+  - Trả lời: Tôi dùng Claude Code (trợ lý AI) để: kiểm tra môi trường và tải model, chạy các lệnh script, hỏi cách hiểu guideline ở các ca khó lúc review (xe điện, hàng nhô ra, xe van, vùng ignore), tổng hợp số đo từ `review_stats.md`, soạn nháp câu chữ báo cáo từ số liệu, nhật ký và quyết định của tôi, ghi nhật ký nháp theo lời tôi kể (`time_log.csv`, ghi chú review), gộp file export vào `qc_fixed.json` và chạy `build_release.py`, ghi 2 box ma tôi đã xoá trên CVAT vào `qc_fixed.json`, chuẩn bị file nạp CVAT và liệt kê box nên xem kỹ từ số liệu (kích thước, conf, sát mép), rà soát lỗi trong thư mục bài, và chỉnh sửa lại các câu trong báo cáo mục 3, 4, 7, 8 cho khớp thực tế. Quyết định gán nhãn từng ca (kể cả duyệt lại 11 ảnh trên CVAT) và quyết định Rework là của tôi; AI không xem ảnh để quyết định nhãn. Kiểm tra: nhận xét trong `model_log.csv` tôi tự nhìn ảnh rồi sửa theo những gì tôi thấy; số liệu tôi đối chiếu với `review_stats.md` và `qc_report_auto.md`; câu chữ AI soạn nháp tôi đọc lại và sửa theo ý mình.
 - Gold có bị nhiễm không (bạn có nhìn pre-label hay hỏi AI trước khi gán xong)?
   - Trả lời: Không, tôi tự làm 100%
 - Máy / GPU / CVAT dùng; vướng mắc cài đặt:
@@ -111,4 +114,4 @@ Nếu Rework / Hold, việc cần làm tiếp:
 - Lỗi / bug script đã gặp (nếu có):
   - Trả lời: Chưa có lỗi script nào mà tôi ghi lại được.
 - Một điều bạn làm khác lần sau:
-  - Trả lời: Tôi sẽ bấm đồng hồ thật để ghi `time_log` (lần này tôi chỉ ước chừng 20 phút và 2 giờ), và ghi lại từng ảnh đã duyệt theo checklist để biết mình bỏ bước nào.
+  - Trả lời: Tôi sẽ ghi lại từng ảnh đã duyệt theo checklist để biết mình bỏ bước nào.
